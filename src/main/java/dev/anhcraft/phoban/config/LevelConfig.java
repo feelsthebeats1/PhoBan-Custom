@@ -53,6 +53,9 @@ public class LevelConfig {
     @Optional
     private List<String> bossKillRewards = Collections.emptyList();
 
+    @Optional
+    private List<String> startRewards = Collections.emptyList();
+
     @Exclude
     private List<MobSpawnRule> mobSpawnRules;
 
@@ -120,6 +123,11 @@ public class LevelConfig {
     @NotNull
     public List<String> getBossKillRewards() {
         return bossKillRewards;
+    }
+
+    @NotNull
+    public List<String> getStartRewards() {
+        return startRewards;
     }
 
     public boolean isAllowTimeout() {

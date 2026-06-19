@@ -4,7 +4,6 @@ import dev.anhcraft.config.bukkit.utils.ItemBuilder;
 import dev.anhcraft.phoban.PhoBan;
 import dev.anhcraft.phoban.game.Difficulty;
 import dev.anhcraft.phoban.game.Stage;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
@@ -61,7 +60,7 @@ public class Placeholder {
     }
 
     public void actionBar(Player player, String str) {
-        player.sendActionBar(LegacyComponentSerializer.legacyAmpersand().deserialize(replace(str)));
+        player.sendActionBar(MiniMessageUtil.deserialize(replace(str)));
     }
 
     public void messageRaw(CommandSender sender, String str) {

@@ -6,10 +6,19 @@ import org.bukkit.entity.Player;
 public class GuiRegistry {
     public static RoomSelectorGui ROOM_SELECTOR;
     public static DifficultySelectorGui DIFFICULTY_SELECTOR;
+    public static CategorySelectorGui CATEGORY_SELECTOR;
     public static Gui SOUND_EXPLORER;
 
     public static void openRoomSelector(Player player) {
         ROOM_SELECTOR.open(player, new RoomSelectorGuiHandler());
+    }
+
+    public static void openRoomSelector(Player player, String category) {
+        ROOM_SELECTOR.open(player, new RoomSelectorGuiHandler(category));
+    }
+
+    public static void openCategorySelector(Player player) {
+        CATEGORY_SELECTOR.open(player, new CategorySelectorGuiHandler());
     }
 
     public static void openDifficultySelector(Player player, String roomId) {

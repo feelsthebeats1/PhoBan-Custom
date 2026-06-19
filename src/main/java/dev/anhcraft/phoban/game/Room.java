@@ -223,6 +223,26 @@ public class Room {
             }
         });
 
+        // Start rewards with 10 tick delay
+        if (!getLevel().getStartRewards().isEmpty()) {
+            plugin.sync(() -> {
+                for (UUID uuid : players) {
+                    Player p = Bukkit.getPlayer(uuid);
+                    if (p == null) continue;
+
+                    Placeholder placeholder = placeholder().add("player", p);
+
+                    if (p.getInventory().firstEmpty() == -1) {
+                        plugin.msg(p, plugin.messageConfig.fullInventoryWarning);
+                    }
+
+                    for (String reward : getLevel().getStartRewards()) {
+                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), placeholder.replace(reward));
+                    }
+                }
+            }, 10);
+        }
+
         for (MobSpawnRule mobSpawnRule : mobSpawnRules) {
             mobSpawner.schedule(mobSpawnRule);
         }
@@ -307,12 +327,14 @@ public class Room {
 
         cleanMobs();
 
+        Location endTp = getEndTeleportLocation();
+
         for (UUID uuid : players) {
             Player p = Bukkit.getPlayer(uuid);
             if (p == null) continue;
             p.resetPlayerTime();
             p.resetPlayerWeather();
-            p.teleportAsync(plugin.mainConfig.spawnLocation);
+            p.teleportAsync(endTp);
         }
 
         plugin.gameManager.destroyRoom(this.id);
@@ -422,7 +444,7 @@ public class Room {
 
         player.resetPlayerTime();
         player.resetPlayerWeather();
-        player.teleportAsync(plugin.mainConfig.spawnLocation);
+        player.teleportAsync(getEndTeleportLocation());
 
         return true;
     }
@@ -547,6 +569,12 @@ public class Room {
     }
 
     @NotNull
+    public Location getEndTeleportLocation() {
+        Location roomEnd = getConfig().getEndTeleportLocation();
+        return roomEnd != null ? roomEnd : plugin.mainConfig.spawnLocation;
+    }
+
+    @NotNull
     public MobSpawner getMobSpawner() {
         return mobSpawner;
     }
@@ -572,11 +600,13 @@ public class Room {
     public int getTimeLeft() {
         int i = 0;
         if (stage == Stage.ENDING) {
-            i = plugin.mainConfig.roomSettings.intermissionTime - timeCounter;
+            Integer roomVal = getConfig().getIntermissionTime();
+            i = (roomVal != null ? roomVal : plugin.mainConfig.roomSettings.intermissionTime) - timeCounter;
         } else if (stage == Stage.PLAYING) {
             i = getLevel().getPlayingTime() - timeCounter;
         } else if (stage == Stage.WAITING) {
-            i = plugin.mainConfig.roomSettings.waitingTime - timeCounter;
+            Integer roomVal = getConfig().getWaitingTime();
+            i = (roomVal != null ? roomVal : plugin.mainConfig.roomSettings.waitingTime) - timeCounter;
         }
         return Math.max(0, i);
     }

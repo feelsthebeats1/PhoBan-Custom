@@ -1,19 +1,17 @@
 package dev.anhcraft.phoban;
 
-import co.aikar.commands.BukkitCommandCompletionContext;
-import co.aikar.commands.CommandCompletions;
-import co.aikar.commands.PaperCommandManager;
 import com.google.common.base.Preconditions;
 import dev.anhcraft.jvmkit.utils.FileUtil;
 import dev.anhcraft.jvmkit.utils.IOUtil;
 import dev.anhcraft.palette.listener.GuiEventListener;
-import dev.anhcraft.phoban.cmd.MainCommand;
+import dev.anhcraft.phoban.cmd.Command;
 import dev.anhcraft.phoban.config.MainConfig;
 import dev.anhcraft.phoban.config.MessageConfig;
 import dev.anhcraft.phoban.game.Room;
 import dev.anhcraft.phoban.integration.PlaceholderBridge;
 import dev.anhcraft.phoban.listener.GameListener;
 import dev.anhcraft.phoban.game.GameManager;
+import dev.anhcraft.phoban.gui.CategorySelectorGui;
 import dev.anhcraft.phoban.gui.DifficultySelectorGui;
 import dev.anhcraft.phoban.gui.GuiRefreshTask;
 import dev.anhcraft.phoban.gui.GuiRegistry;
@@ -22,7 +20,7 @@ import dev.anhcraft.phoban.storage.PlayerDataManager;
 import dev.anhcraft.phoban.tasks.FreeTicketTask;
 import dev.anhcraft.phoban.tasks.GameTickingTask;
 import dev.anhcraft.phoban.util.ConfigHelper;
-import net.md_5.bungee.api.ChatColor;
+import dev.anhcraft.phoban.util.MiniMessageUtil;
 import org.bukkit.GameMode;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -53,12 +51,14 @@ public final class PhoBan extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new GuiEventListener(), this);
         getServer().getPluginManager().registerEvents(new GameListener(this), this);
 
-        PaperCommandManager pcm = new PaperCommandManager(this);
-        pcm.enableUnstableAPI("help");
-        pcm.registerCommand(new MainCommand(this));
-        CommandCompletions<BukkitCommandCompletionContext> cmpl = pcm.getCommandCompletions();
-        cmpl.registerAsyncCompletion("room", context -> gameManager.getRoomIds());
-        cmpl.registerAsyncCompletion("activeRoom", context -> gameManager.getActiveRoomIds());
+        Command command = new Command(this);
+        org.bukkit.command.PluginCommand pluginCommand = getCommand("phoban");
+        if (pluginCommand == null) {
+            getLogger().severe("Command 'phoban' is not defined in plugin.yml");
+            return;
+        }
+        pluginCommand.setExecutor(command);
+        pluginCommand.setTabCompleter(command);
     }
 
     public void debug(@NotNull String format, @NotNull Object... args) {
@@ -73,18 +73,18 @@ public final class PhoBan extends JavaPlugin {
 
     public void msg(CommandSender sender, String str) {
         if (str == null) {
-            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', messageConfig.prefix + "&c<Empty message>"));
+            sender.sendMessage(MiniMessageUtil.parse(messageConfig.prefix + "&c<Empty message>"));
             return;
         }
-        sender.sendMessage(ChatColor.translateAlternateColorCodes('&', messageConfig.prefix + str));
+        sender.sendMessage(MiniMessageUtil.parse(messageConfig.prefix + str));
     }
 
     public void rawMsg(CommandSender sender, String str) {
         if (str == null) {
-            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&c<Empty message>"));
+            sender.sendMessage(MiniMessageUtil.parse("&c<Empty message>"));
             return;
         }
-        sender.sendMessage(ChatColor.translateAlternateColorCodes('&', str));
+        sender.sendMessage(MiniMessageUtil.parse(str));
     }
 
     public void sync(Runnable runnable) {
@@ -114,6 +114,7 @@ public final class PhoBan extends JavaPlugin {
         new File(getDataFolder(), "gui").mkdir();
         GuiRegistry.ROOM_SELECTOR = ConfigHelper.load(RoomSelectorGui.class, requestConfig("gui/room-selector.yml"));
         GuiRegistry.DIFFICULTY_SELECTOR = ConfigHelper.load(DifficultySelectorGui.class, requestConfig("gui/difficulty-selector.yml"));
+        GuiRegistry.CATEGORY_SELECTOR = ConfigHelper.load(CategorySelectorGui.class, requestConfig("gui/category-selector.yml"));
         GuiRegistry.SOUND_EXPLORER = ConfigHelper.load(DifficultySelectorGui.class, requestConfig("gui/sound-explorer.yml"));
 
         playerDataManager.reload();

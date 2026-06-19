@@ -23,8 +23,12 @@ public class RoomConfig {
     @Validation(notNull = true)
     private String name;
 
+    private String category;
+
     @Validation(notNull = true)
     private Material icon;
+
+    private String permission;
 
     private String requirement;
 
@@ -40,6 +44,8 @@ public class RoomConfig {
     @Validation(notNull = true)
     private Location spawnLocation;
 
+    private Location endTeleportLocation;
+
     @Validation(notNull = true)
     private Location queueLocation;
 
@@ -48,6 +54,10 @@ public class RoomConfig {
 
     @Validation(notNull = true)
     private Map<Difficulty, LevelConfig> levels;
+
+    private Integer waitingTime;
+
+    private Integer intermissionTime;
 
     @Exclude
     private RoomRequirement roomRequirement;
@@ -81,6 +91,26 @@ public class RoomConfig {
     }
 
     @Nullable
+    public String getPermission() {
+        return permission;
+    }
+
+    @Nullable
+    public String getCategory() {
+        return category;
+    }
+
+    @Nullable
+    public Integer getWaitingTime() {
+        return waitingTime;
+    }
+
+    @Nullable
+    public Integer getIntermissionTime() {
+        return intermissionTime;
+    }
+
+    @Nullable
     public RoomRequirement getRoomRequirement() {
         return roomRequirement;
     }
@@ -97,6 +127,11 @@ public class RoomConfig {
     @NotNull
     public Location getSpawnLocation() {
         return spawnLocation;
+    }
+
+    @Nullable
+    public Location getEndTeleportLocation() {
+        return endTeleportLocation;
     }
 
     @NotNull

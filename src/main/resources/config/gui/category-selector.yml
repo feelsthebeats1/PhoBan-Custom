@@ -1,0 +1,32 @@
+title: "&0&lChọn Danh Mục Phó Bản"
+layout:
+  - "---------"
+  - "--xxxxx--"
+  - "--xxxxx--"
+  - "---------"
+components:
+  "-":
+    material: black_stained_glass_pane
+    name: "&a"
+  "x":
+    type: category
+    material: black_stained_glass_pane
+    name: "&a"
+
+categories:
+  boss:
+    material: egg
+    name: "&c&lBOSS"
+    lore:
+      - ""
+      - "&7Phó bản tiêu diệt Boss"
+      - ""
+      - "&e> Nhấn để chọn"
+  dungeon:
+    material: stone_bricks
+    name: "&8&lDUNGEON"
+    lore:
+      - ""
+      - "&7Phó bản khám phá hầm ngục"
+      - ""
+      - "&e> Nhấn để chọn"

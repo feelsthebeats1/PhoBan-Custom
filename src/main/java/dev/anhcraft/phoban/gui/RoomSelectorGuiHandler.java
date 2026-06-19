@@ -19,6 +19,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,6 +27,15 @@ import java.util.List;
 
 public class RoomSelectorGuiHandler extends GuiHandler implements AutoRefresh {
     private PlayerData playerData;
+    private final String categoryFilter;
+
+    public RoomSelectorGuiHandler() {
+        this.categoryFilter = null;
+    }
+
+    public RoomSelectorGuiHandler(@Nullable String categoryFilter) {
+        this.categoryFilter = categoryFilter;
+    }
 
     @Override
     public void onPreOpen(@NotNull Player player) {
@@ -43,6 +53,22 @@ public class RoomSelectorGuiHandler extends GuiHandler implements AutoRefresh {
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), Placeholder.create().add("player", player.getName()).replace(PhoBan.instance.mainConfig.infoItemCmd));
                 }
             });
+        }
+
+        // Back button: hiện khi có category filter, ẩn khi không
+        List<Integer> backSlots = new ArrayList<>(locateComponent("back"));
+        if (categoryFilter != null) {
+            listen("back", new ClickEvent() {
+                @Override
+                public void onClick(@NotNull InventoryClickEvent inventoryClickEvent, @NotNull Player player, int i) {
+                    GuiRegistry.openCategorySelector(player);
+                }
+            });
+        } else {
+            for (int slot : backSlots) {
+                resetItem(slot);
+                getSlot(slot).clearEvents();
+            }
         }
 
         playerData = PhoBan.instance.playerDataManager.getData(player);
@@ -70,6 +96,21 @@ public class RoomSelectorGuiHandler extends GuiHandler implements AutoRefresh {
             RoomConfig roomConfig = PhoBan.instance.gameManager.getRoomConfig(roomId);
 
             if (roomConfig == null || (!roomConfig.isEnabled() && !player.hasPermission("phoban.admin"))) {
+                resetItem(slot);
+                getSlot(slot).clearEvents();
+                continue;
+            }
+
+            // Check room permission
+            String roomPerm = roomConfig.getPermission();
+            if (roomPerm != null && !player.hasPermission(roomPerm)) {
+                resetItem(slot);
+                getSlot(slot).clearEvents();
+                continue;
+            }
+
+            // Apply category filter
+            if (categoryFilter != null && !categoryFilter.equals(roomConfig.getCategory())) {
                 resetItem(slot);
                 getSlot(slot).clearEvents();
                 continue;

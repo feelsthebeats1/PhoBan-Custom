@@ -69,6 +69,15 @@ public class GameManager {
         return roomConfigMap.keySet();
     }
 
+    public Collection<String> getCategories() {
+        return roomConfigMap.values().stream()
+                .map(RoomConfig::getCategory)
+                .filter(Objects::nonNull)
+                .distinct()
+                .sorted()
+                .toList();
+    }
+
     public Collection<String> getActiveRoomIds() {
         return roomMap.keySet();
     }

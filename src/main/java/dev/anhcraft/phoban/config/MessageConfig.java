@@ -37,4 +37,5 @@ public class MessageConfig {
     public String freeTicketReceived;
     public String createRoomCooldown;
     public String commandBlocked;
+    public String fullInventoryWarning;
 }

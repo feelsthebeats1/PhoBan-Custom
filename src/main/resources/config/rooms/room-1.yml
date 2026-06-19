@@ -3,8 +3,16 @@
 # Mặc định là false
 enabled: false
 
+# Thêm permission cho phòng
+# trong gui chọn phòng, người chơi có permission này mới hiện room
+# cũng như là đề suất lệnh lệnh
+permission: "phoban.room.1"
+
 # Tên phòng chơi hiện tại
 name: "&aGod Skeleton"
+
+# config phân loại phó bản, check category-selector.yml
+category: "boss"
 
 # Icon phòng chơi hiện tại
 # Danh sách: https://jd.papermc.io/paper/1.21.1/org/bukkit/Material.html
@@ -20,6 +28,16 @@ icon: bone
 # Khoá thời tiết (tuỳ chọn)
 # Giá trị: downfall hoặc clear
 #weather-lock: downfall
+
+# Thời gian chờ trước khi bắt đầu (giây)
+# Nếu không set sẽ dùng giá trị mặc định từ config.yml
+# Có thể set 0 để bỏ qua thời gian chờ
+#waiting-time: 10
+
+# Thời gian chờ sau khi trao giải trước khi kết thúc phòng (giây)
+# Nếu không set sẽ dùng giá trị mặc định từ config.yml
+# Có thể set 0 để kết thúc ngay sau khi trao giải
+#intermission-time: 5
 
 # Khoá thời gian (tick) (tuỳ chọn)
 # https://minecraft.wiki/w/Daylight_cycle
@@ -40,6 +58,11 @@ queue-location: world 0 128 0
 # Vị trí spawn khi vào phòng (trạng thái đang chơi), hoặc khi từ giai đoạn chờ sang bắt đầu
 # Dùng /pb getpos
 spawn-location: world 0 128 0
+
+# Vị trí teleport khi kết thúc phòng (tuỳ chọn)
+# Nếu không set sẽ dùng spawn-location ở config.yml
+# Dùng /pb getpos
+#end-teleport-location: world 0 128 0
 
 # Tên region WorldGuard chứa toàn bộ map phòng chơi
 region: "room1"
@@ -89,6 +112,11 @@ levels:
     # Gửi tin nhắn khi bắt đầu
     start-messages:
       - "&aGame Bắt Đầu!"
+
+    # Quà khi bắt đầu game
+    # Sẽ give sau 10 ticks (~0.5 giây), nếu inventory đầy sẽ drop ra đất
+    start-rewards:
+      - eco give {player} 5000
 
     # Các mob để troll người chơi (giết không được gì)
     # Spawn tại vị trí chỉ định: <entity> <location> [options...]

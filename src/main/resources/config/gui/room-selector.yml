@@ -3,7 +3,7 @@ layout:
   - "---------"
   - "-xxxxxxx-"
   - "-xxxxxxx-"
-  - "--------I"
+  - "b-------I"
 components:
   # Xem config item: https://anhcraft.gitbook.io/vouchers/configuration/voucher-configuration/custom-item
   "-":
@@ -13,6 +13,13 @@ components:
     type: room
     material: black_stained_glass_pane
     name: "&a"
+  "b": # config cũng được ko có cũng ko sao, ẩn/hiện nút back được
+    type: back
+    material: arrow
+    name: "&eQuay về"
+    lore:
+      - ""
+      - "&fQuay về danh mục phó bản"
   "I":
     type: info
     material: book
