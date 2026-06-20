@@ -31,6 +31,8 @@ import java.util.Locale;
 import static org.bukkit.ChatColor.*;
 
 public class Command implements CommandExecutor, TabCompleter {
+    private static final String USE_PERMISSION = "phoban.use";
+
     private final PhoBan plugin;
 
     public Command(PhoBan plugin) {
@@ -39,6 +41,7 @@ public class Command implements CommandExecutor, TabCompleter {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull org.bukkit.command.Command command, @NotNull String label, @NotNull String[] args) {
+        if (!perm(sender, USE_PERMISSION)) return true;
         if (args.length == 0) {
             Player player = requirePlayer(sender);
             if (player != null) GuiRegistry.openRoomSelector(player);
@@ -379,6 +382,7 @@ public class Command implements CommandExecutor, TabCompleter {
 
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull org.bukkit.command.Command command, @NotNull String label, @NotNull String[] args) {
+        if (!sender.hasPermission(USE_PERMISSION)) return Collections.emptyList();
         if (args.length == 1) return match(args[0], top(sender));
         String sub = args[0].toLowerCase(Locale.ROOT);
         return switch (sub) {

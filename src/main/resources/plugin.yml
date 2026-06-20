@@ -6,8 +6,14 @@ commands:
   phoban:
     description: Main PhoBan command
     usage: /phoban [subcommand]
+    permission: phoban.use
+    permission-message: You don't have permission to use this command!
     aliases:
       - pb
+permissions:
+  phoban.use:
+    description: Allows using the root PhoBan command
+    default: op
 depend:
   - PlaceholderAPI
   - MythicMobs
