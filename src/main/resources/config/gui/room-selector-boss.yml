@@ -1,0 +1,17 @@
+# Per-category override for "boss" category rooms
+# Chỉ ghi các section muốn thay đổi so với room-selector.yml
+# Các section không ghi sẽ kế thừa từ room-selector.yml
+title: "&0&lBoss Raid"
+layout:
+  - "---------"
+  - "--xxxxx--"
+  - "--xxxxx--"
+  - "b-------I"
+components:
+  "b":
+    type: back
+    material: nether_star
+    name: "&eQuay về danh mục"
+    lore:
+      - ""
+      - "&fQuay về danh mục phó bản"
