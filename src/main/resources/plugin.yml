@@ -14,6 +14,110 @@ permissions:
   phoban.use:
     description: Allows using the root PhoBan command
     default: op
+  phoban.profile:
+    description: Allows viewing player PhoBan profiles
+    default: op
+  phoban.reload:
+    description: Allows reloading PhoBan
+    default: op
+  phoban.enable:
+    description: Allows enabling rooms
+    default: op
+  phoban.disable:
+    description: Allows disabling rooms
+    default: op
+  phoban.list:
+    description: Allows listing PhoBan rooms
+    default: op
+  phoban.join:
+    description: Allows force joining players to active rooms
+    default: op
+  phoban.start:
+    description: Allows starting active rooms
+    default: op
+  phoban.end:
+    description: Allows ending active rooms
+    default: op
+  phoban.terminate:
+    description: Allows terminating active rooms
+    default: op
+  phoban.reset.respawn:
+    description: Allows resetting respawn chances
+    default: op
+  phoban.reset.data:
+    description: Allows resetting player data
+    default: op
+  phoban.tp:
+    description: Allows teleporting players to room spawn locations
+    default: op
+  phoban.categories:
+    description: Allows opening PhoBan category menus
+    default: op
+  phoban.sound:
+    description: Allows opening the sound explorer
+    default: op
+  phoban.ticket.add:
+    description: Allows adding PhoBan tickets
+    default: op
+  phoban.ticket.set:
+    description: Allows setting PhoBan tickets
+    default: op
+  phoban.admin:
+    description: Allows bypassing room setup restrictions
+    default: op
+  phoban.admin.create:
+    description: Allows creating room instances from the admin command
+    default: op
+  phoban.admin.openCategories:
+    description: Allows opening category menus for other players
+    default: op
+  phoban.getpos:
+    description: Allows copying the current block position
+    default: op
+  phoban.bypass.create-cooldown:
+    description: Bypasses room creation cooldown
+    default: op
+  phoban.reset:
+    description: Grants all reset commands
+    default: op
+    children:
+      phoban.reset.respawn: true
+      phoban.reset.data: true
+  phoban.ticket:
+    description: Grants all ticket commands
+    default: op
+    children:
+      phoban.ticket.add: true
+      phoban.ticket.set: true
+  phoban.admin.commands:
+    description: Grants all admin subcommands
+    default: op
+    children:
+      phoban.admin.create: true
+      phoban.admin.openCategories: true
+  phoban.*:
+    description: Grants all PhoBan permissions
+    default: op
+    children:
+      phoban.use: true
+      phoban.profile: true
+      phoban.reload: true
+      phoban.enable: true
+      phoban.disable: true
+      phoban.list: true
+      phoban.join: true
+      phoban.start: true
+      phoban.end: true
+      phoban.terminate: true
+      phoban.reset: true
+      phoban.tp: true
+      phoban.categories: true
+      phoban.sound: true
+      phoban.ticket: true
+      phoban.admin: true
+      phoban.admin.commands: true
+      phoban.getpos: true
+      phoban.bypass.create-cooldown: true
 depend:
   - PlaceholderAPI
   - MythicMobs

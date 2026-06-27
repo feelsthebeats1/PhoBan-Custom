@@ -18,6 +18,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,10 +26,16 @@ import java.util.List;
 
 public class DifficultySelectorGuiHandler extends GuiHandler implements AutoRefresh {
     private final String roomId;
+    private final String categoryFilter;
     private PlayerData playerData;
 
     public DifficultySelectorGuiHandler(String roomId) {
+        this(roomId, null);
+    }
+
+    public DifficultySelectorGuiHandler(String roomId, @Nullable String categoryFilter) {
         this.roomId = roomId;
+        this.categoryFilter = categoryFilter;
     }
 
     @Override
@@ -54,7 +61,7 @@ public class DifficultySelectorGuiHandler extends GuiHandler implements AutoRefr
         listen("quit", new ClickEvent() {
             @Override
             public void onClick(@NotNull InventoryClickEvent clickEvent, @NotNull Player player, int slot) {
-                GuiRegistry.openRoomSelector(player);
+                openPreviousRoomSelector(player);
             }
         });
 
@@ -80,7 +87,7 @@ public class DifficultySelectorGuiHandler extends GuiHandler implements AutoRefr
 
             RoomConfig roomConfig = PhoBan.instance.gameManager.getRoomConfig(roomId);
             if (roomConfig == null || (!roomConfig.isEnabled() && !player.hasPermission("phoban.admin"))) {
-                GuiRegistry.openRoomSelector(player);
+                openPreviousRoomSelector(player);
                 return;
             }
 
@@ -88,7 +95,7 @@ public class DifficultySelectorGuiHandler extends GuiHandler implements AutoRefr
             Room room = PhoBan.instance.gameManager.getRoom(roomId);
 
             if (room != null) {
-                GuiRegistry.openRoomSelector(player);
+                openPreviousRoomSelector(player);
                 return;
             }
 
@@ -156,5 +163,10 @@ public class DifficultySelectorGuiHandler extends GuiHandler implements AutoRefr
                 PhoBan.instance.gameManager.attemptCreateRoom(player, roomId, difficulty, challengeLevel);
             });
         }
+    }
+
+    private void openPreviousRoomSelector(Player player) {
+        if (categoryFilter == null) GuiRegistry.openRoomSelector(player);
+        else GuiRegistry.openRoomSelector(player, categoryFilter);
     }
 }

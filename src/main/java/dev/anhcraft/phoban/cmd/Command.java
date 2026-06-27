@@ -280,7 +280,15 @@ public class Command implements CommandExecutor, TabCompleter {
         if (player == null) return;
         if (args.length < 2) {
             if (plugin.gameManager.getCategories().isEmpty()) GuiRegistry.openRoomSelector(player);
-        } else GuiRegistry.openCategorySelector(player);
+            else GuiRegistry.openCategorySelector(player);
+            return;
+        }
+        String category = category(args[1]);
+        if (category == null) {
+            sender.sendMessage(RED + "Category not found: " + args[1]);
+            return;
+        }
+        GuiRegistry.openRoomSelector(player, category);
     }
 
     private void sound(CommandSender sender) {
@@ -466,6 +474,13 @@ public class Command implements CommandExecutor, TabCompleter {
 
     private List<String> rooms(CommandSender sender) {
         return plugin.gameManager.getRoomIds().stream().filter(id -> canAccess(sender, id)).toList();
+    }
+
+    private String category(String input) {
+        for (String category : plugin.gameManager.getCategories()) {
+            if (category.equalsIgnoreCase(input)) return category;
+        }
+        return null;
     }
 
     private List<String> activeRooms(CommandSender sender) {

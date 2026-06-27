@@ -5,7 +5,7 @@ enabled: false
 
 # Thêm permission cho phòng
 # trong gui chọn phòng, người chơi có permission này mới hiện room
-# cũng như là đề suất lệnh lệnh
+# cũng như là đề suất lệnh
 permission: "phoban.room.1"
 
 # Tên phòng chơi hiện tại
