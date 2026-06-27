@@ -12,6 +12,7 @@ public class CategorySelectorGui extends Gui {
     @Configurable(keyNamingStyle = Configurable.NamingStyle.TRAIN_CASE)
     public static class CategoryItem {
         public String material;
+        public int customModelData;
         public String name;
         public java.util.List<String> lore;
     }
