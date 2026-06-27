@@ -90,7 +90,7 @@ public final class PhoBan extends JavaPlugin {
         Component messageComponent = MiniMessageUtil.deserialize(str);
         
         Component combined = prefixComponent.append(messageComponent);
-        sender.sendMessage(LegacyComponentSerializer.legacySection().serialize(combined));
+        sender.sendMessage(combined);
     }
 
     public void msg(CommandSender sender, String str) {
