@@ -116,6 +116,19 @@ public class GameManager {
             return;
         }
 
+        RoomConfig config = roomConfigMap.get(roomId);
+        if (config == null) {
+            plugin.msg(player, "&cRoom not found: " + roomId);
+            return;
+        }
+
+        // Check room permission
+        String roomPerm = config.getPermission();
+        if (roomPerm != null && !player.hasPermission(roomPerm) && !player.hasPermission("phoban.admin")) {
+            plugin.msg(player, "&cYou don't have permission to access this room!");
+            return;
+        }
+
         Room room = roomMap.get(roomId);
         if (room != null) {
             GuiRegistry.openRoomSelector(player);
@@ -148,6 +161,15 @@ public class GameManager {
         if (player2room.containsKey(player.getUniqueId())) {
             plugin.msg(player, plugin.messageConfig.alreadyJoined);
             return;
+        }
+
+        RoomConfig config = roomConfigMap.get(roomId);
+        if (config != null) {
+            String roomPerm = config.getPermission();
+            if (roomPerm != null && !player.hasPermission(roomPerm) && !player.hasPermission("phoban.admin")) {
+                plugin.msg(player, "&cYou don't have permission to access this room!");
+                return;
+            }
         }
 
         Room room = roomMap.get(roomId);

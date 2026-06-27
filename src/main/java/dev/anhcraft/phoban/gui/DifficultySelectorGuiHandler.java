@@ -40,6 +40,16 @@ public class DifficultySelectorGuiHandler extends GuiHandler implements AutoRefr
 
     @Override
     public void onPreOpen(@NotNull Player player) {
+        // Check room permission before opening
+        RoomConfig initialConfig = PhoBan.instance.gameManager.getRoomConfig(roomId);
+        if (initialConfig != null) {
+            String initialPerm = initialConfig.getPermission();
+            if (initialPerm != null && !player.hasPermission(initialPerm) && !player.hasPermission("phoban.admin")) {
+                openPreviousRoomSelector(player);
+                return;
+            }
+        }
+
         replaceItem("info", new ItemReplacer() {
             @Override
             public @NotNull ItemBuilder apply(int i, @NotNull ItemBuilder itemBuilder) {
@@ -87,6 +97,13 @@ public class DifficultySelectorGuiHandler extends GuiHandler implements AutoRefr
 
             RoomConfig roomConfig = PhoBan.instance.gameManager.getRoomConfig(roomId);
             if (roomConfig == null || (!roomConfig.isEnabled() && !player.hasPermission("phoban.admin"))) {
+                openPreviousRoomSelector(player);
+                return;
+            }
+
+            // Check room permission
+            String roomPerm = roomConfig.getPermission();
+            if (roomPerm != null && !player.hasPermission(roomPerm) && !player.hasPermission("phoban.admin")) {
                 openPreviousRoomSelector(player);
                 return;
             }
