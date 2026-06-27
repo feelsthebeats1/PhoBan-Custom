@@ -20,7 +20,10 @@ import dev.anhcraft.phoban.storage.PlayerDataManager;
 import dev.anhcraft.phoban.tasks.FreeTicketTask;
 import dev.anhcraft.phoban.tasks.GameTickingTask;
 import dev.anhcraft.phoban.util.ConfigHelper;
+import dev.anhcraft.phoban.util.ConfigMerger;
 import dev.anhcraft.phoban.util.MiniMessageUtil;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.GameMode;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -71,20 +74,31 @@ public final class PhoBan extends JavaPlugin {
         }
     }
 
-    public void msg(CommandSender sender, String str) {
+    private void sendMessage(CommandSender sender, String str, boolean usePrefix) {
         if (str == null) {
-            sender.sendMessage(MiniMessageUtil.parse(messageConfig.prefix + "&c<Empty message>"));
+            String errorMsg = usePrefix ? 
+                messageConfig.prefix + "&c<Empty message>" : 
+                "&c<Empty message>";
+            sender.sendMessage(MiniMessageUtil.parse(errorMsg));
             return;
         }
-        sender.sendMessage(MiniMessageUtil.parse(messageConfig.prefix + str));
+        
+        Component prefixComponent = usePrefix ? 
+            LegacyComponentSerializer.legacyAmpersand().deserialize(messageConfig.prefix) : 
+            Component.empty();
+        
+        Component messageComponent = MiniMessageUtil.deserialize(str);
+        
+        Component combined = prefixComponent.append(messageComponent);
+        sender.sendMessage(LegacyComponentSerializer.legacySection().serialize(combined));
+    }
+
+    public void msg(CommandSender sender, String str) {
+        sendMessage(sender, str, true);
     }
 
     public void rawMsg(CommandSender sender, String str) {
-        if (str == null) {
-            sender.sendMessage(MiniMessageUtil.parse("&c<Empty message>"));
-            return;
-        }
-        sender.sendMessage(MiniMessageUtil.parse(str));
+        sendMessage(sender, str, false);
     }
 
     public void sync(Runnable runnable) {
@@ -119,6 +133,17 @@ public final class PhoBan extends JavaPlugin {
 
         playerDataManager.reload();
         gameManager.reload();
+
+        // Load per-category room selector overrides (after gameManager.reload so categories are ready)
+        GuiRegistry.CATEGORY_ROOM_SELECTORS.clear();
+        for (String category : gameManager.getCategories()) {
+            String fileName = "gui/room-selector-" + category + ".yml";
+            File catFile = new File(getDataFolder(), fileName);
+            if (!catFile.exists()) continue;
+            YamlConfiguration catConfig = YamlConfiguration.loadConfiguration(catFile);
+            RoomSelectorGui merged = ConfigMerger.mergeRoomSelector(GuiRegistry.ROOM_SELECTOR, catConfig);
+            GuiRegistry.CATEGORY_ROOM_SELECTORS.put(category, merged);
+        }
 
         new GuiRefreshTask().runTaskTimer(this, 0L, 20L);
         new GameTickingTask().runTaskTimerAsynchronously(this, 0L, 20L);
