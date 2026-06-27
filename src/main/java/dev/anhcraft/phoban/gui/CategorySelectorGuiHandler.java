@@ -31,13 +31,12 @@ public class CategorySelectorGuiHandler extends GuiHandler {
 
             String category = categories.get(i);
             CategorySelectorGui.CategoryItem catItem = GuiRegistry.CATEGORY_SELECTOR.categories.get(category);
-            if (catItem == null) {
-                resetItem(slot);
-                getSlot(slot).clearEvents();
-                continue;
-            }
-
             replaceItem(slot, (index, itemBuilder) -> {
+                if (catItem == null) {
+                    itemBuilder.material(Material.CHEST);
+                    itemBuilder.name("&a" + category);
+                    return itemBuilder;
+                }
                 Material mat;
                 try {
                     mat = Material.valueOf(catItem.material.toUpperCase());
@@ -45,6 +44,9 @@ public class CategorySelectorGuiHandler extends GuiHandler {
                     mat = Material.BARRIER;
                 }
                 itemBuilder.material(mat);
+                if (catItem.customModelData > 0) {
+                    itemBuilder.customModelData(catItem.customModelData);
+                }
                 itemBuilder.name(catItem.name);
                 if (catItem.lore != null) {
                     itemBuilder.lore().addAll(catItem.lore);
