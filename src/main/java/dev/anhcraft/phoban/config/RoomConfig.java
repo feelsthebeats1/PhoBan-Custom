@@ -28,6 +28,8 @@ public class RoomConfig {
     @Validation(notNull = true)
     private Material icon;
 
+    private int customModelData;
+
     private String permission;
 
     private String requirement;
@@ -67,6 +69,11 @@ public class RoomConfig {
         roomRequirement = requirement == null ? null : RoomRequirement.parse(requirement);
     }
 
+    public void applyIconTo(dev.anhcraft.config.bukkit.utils.ItemBuilder builder) {
+        builder.material(icon);
+        if (customModelData > 0) builder.customModelData(customModelData);
+    }
+
     public boolean isEnabled() {
         return enabled;
     }
@@ -79,6 +86,10 @@ public class RoomConfig {
     @NotNull
     public Material getIcon() {
         return icon;
+    }
+
+    public int getCustomModelData() {
+        return customModelData;
     }
 
     public int getDisplayOrder() {
