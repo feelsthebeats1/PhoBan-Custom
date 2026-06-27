@@ -81,7 +81,7 @@ public class RoomSelectorGuiHandler extends GuiHandler implements AutoRefresh {
 
         List<Integer> slots = new ArrayList<>(locateComponent("room"));
         Collections.sort(slots);
-        List<String> roomIds = new ArrayList<>(PhoBan.instance.gameManager.getRoomIds());
+        List<String> roomIds = visibleRooms(player);
 
         for (int i = 0; i < slots.size(); i++) {
             int slot = slots.get(i);
@@ -172,7 +172,7 @@ public class RoomSelectorGuiHandler extends GuiHandler implements AutoRefresh {
                             .add("requiredDifficulty", failedRequirement.minimumDifficulty());
 
                     replaceItem(slot, (index, itemBuilder) -> {
-                        itemBuilder.material(roomConfig.getIcon());
+                        roomConfig.applyIconTo(itemBuilder);
                         itemBuilder.name(roomConfig.getName());
                         itemBuilder.lore(roomConfig.getDescription());
                         itemBuilder.lore().addAll(GuiRegistry.ROOM_SELECTOR.roomLockedTrailer.get(stage));
@@ -184,7 +184,7 @@ public class RoomSelectorGuiHandler extends GuiHandler implements AutoRefresh {
             }
 
             replaceItem(slot, (index, itemBuilder) -> {
-                itemBuilder.material(roomConfig.getIcon());
+                roomConfig.applyIconTo(itemBuilder);
                 itemBuilder.name(roomConfig.getName());
                 itemBuilder.lore(roomConfig.getDescription());
                 if (stage == Stage.PLAYING && room.getLevel().isAllowOverfull()) {
@@ -196,8 +196,25 @@ public class RoomSelectorGuiHandler extends GuiHandler implements AutoRefresh {
             });
 
             getSlot(slot).setEvents((ClickEvent) (clickEvent, player1, slot1) -> {
+                if (categoryFilter != null && PhoBan.instance.gameManager.getRoom(roomId) == null) {
+                    GuiRegistry.openDifficultySelector(player, roomId, categoryFilter);
+                    return;
+                }
                 PhoBan.instance.gameManager.attemptJoinRoom(player, roomId, false);
             });
         }
+    }
+
+    private List<String> visibleRooms(Player player) {
+        List<String> roomIds = new ArrayList<>();
+        for (String roomId : PhoBan.instance.gameManager.getRoomIds()) {
+            RoomConfig roomConfig = PhoBan.instance.gameManager.getRoomConfig(roomId);
+            if (roomConfig == null || (!roomConfig.isEnabled() && !player.hasPermission("phoban.admin"))) continue;
+            String roomPerm = roomConfig.getPermission();
+            if (roomPerm != null && !player.hasPermission(roomPerm)) continue;
+            if (categoryFilter != null && !categoryFilter.equals(roomConfig.getCategory())) continue;
+            roomIds.add(roomId);
+        }
+        return roomIds;
     }
 }
