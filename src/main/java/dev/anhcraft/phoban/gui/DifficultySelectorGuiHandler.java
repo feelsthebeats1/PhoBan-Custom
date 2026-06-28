@@ -133,7 +133,7 @@ public class DifficultySelectorGuiHandler extends GuiHandler implements AutoRefr
                         .add("requiredDifficulty", Difficulty.values()[difficulty.ordinal()-1]);
                 replaceItem(slot, (index, itemBuilder) -> {
                     itemBuilder.name(GuiRegistry.DIFFICULTY_SELECTOR.difficultyName);
-                    itemBuilder.material(roomConfig.getIcon());
+                    roomConfig.applyIconTo(itemBuilder);
                     itemBuilder.lore(roomConfig.getDescription());
                     itemBuilder.lore().addAll(GuiRegistry.DIFFICULTY_SELECTOR.roomLockedTrailer);
                     return placeholder.replace(itemBuilder);
@@ -170,7 +170,7 @@ public class DifficultySelectorGuiHandler extends GuiHandler implements AutoRefr
 
             replaceItem(slot, (index, itemBuilder) -> {
                 itemBuilder.name(GuiRegistry.DIFFICULTY_SELECTOR.difficultyName);
-                itemBuilder.material(roomConfig.getIcon());
+                roomConfig.applyIconTo(itemBuilder);
                 itemBuilder.lore(roomConfig.getDescription());
                 itemBuilder.lore().addAll(GuiRegistry.DIFFICULTY_SELECTOR.roomLoreTrailer);
                 return placeholder.replace(itemBuilder);
