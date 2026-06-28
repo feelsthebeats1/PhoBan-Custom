@@ -16,7 +16,9 @@ category: "boss"
 
 # Icon phòng chơi hiện tại
 # Danh sách: https://jd.papermc.io/paper/1.21.1/org/bukkit/Material.html
-icon: bone
+icon: paper
+# Custom model data (tuỳ chọn) — dùng với resource pack để thay đổi texture item
+custom-model-data: 15151
 
 # Yêu cầu đã chơi phòng nào + độ khó tối thiểu
 # Dùng ID phòng (là tên file)

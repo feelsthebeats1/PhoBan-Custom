@@ -145,6 +145,17 @@ public final class PhoBan extends JavaPlugin {
             GuiRegistry.CATEGORY_ROOM_SELECTORS.put(category, merged);
         }
 
+        // Load per-room difficulty selector overrides
+        GuiRegistry.ROOM_DIFFICULTY_SELECTORS.clear();
+        for (String roomId : gameManager.getRoomIds()) {
+            String fileName = "gui/difficulty-selector-" + roomId + ".yml";
+            File diffFile = new File(getDataFolder(), fileName);
+            if (!diffFile.exists()) continue;
+            YamlConfiguration diffConfig = YamlConfiguration.loadConfiguration(diffFile);
+            DifficultySelectorGui merged = ConfigMerger.mergeDifficultySelector(GuiRegistry.DIFFICULTY_SELECTOR, diffConfig);
+            GuiRegistry.ROOM_DIFFICULTY_SELECTORS.put(roomId, merged);
+        }
+
         new GuiRefreshTask().runTaskTimer(this, 0L, 20L);
         new GameTickingTask().runTaskTimerAsynchronously(this, 0L, 20L);
         (freeTicketTask = new FreeTicketTask(this)).runTaskTimerAsynchronously(this, 0L, mainConfig.freeTicketEvery*20L);

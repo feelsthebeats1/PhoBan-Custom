@@ -1,0 +1,29 @@
+# Per-room override cho difficulty selector
+# Tên file: difficulty-selector-<roomId>.yml
+# Chỉ ghi các section muốn thay đổi so với difficulty-selector.yml
+title: "&0&lThử thách đặc biệt"
+layout:
+  - "---------"
+  - "--xxxxx--"
+  - "---------"
+  - "----q---I"
+components:
+  "x":
+    type: difficulty
+    material: blaze_powder
+    custom-model-data: 5001
+    name: "&a"
+difficulty-name: "&c⚔ &a{dungeon} &7| {difficulty} {challengeLevel}"
+room-lore-trailer:
+  - ""
+  - "&eThông tin:"
+  - "&7 ▪ Người chơi: &f{currentPlayers}/{maxPlayers}"
+  - "&7 ▪ Trạng thái: {stage}"
+  - "&7 ▪ Độ khó: {difficulty} {challengeLevel}"
+  - ""
+  - "&e> Nhấn để vào"
+room-locked-trailer:
+  - ""
+  - "&eThông tin:"
+  - "&c&l ✕&7 Chưa mở khoá!"
+  - "&7 ▪ &cYêu cầu: &7{requiredRoom}&7 mức độ {requiredDifficulty}"

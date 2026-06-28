@@ -2,6 +2,7 @@ package dev.anhcraft.phoban.util;
 
 import dev.anhcraft.palette.ui.element.Component;
 import dev.anhcraft.phoban.game.Stage;
+import dev.anhcraft.phoban.gui.DifficultySelectorGui;
 import dev.anhcraft.phoban.gui.RoomSelectorGui;
 import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
@@ -62,6 +63,61 @@ public class ConfigMerger {
         merged.roomLoreTrailerOverfull = override.contains("room-lore-trailer-overfull")
                 ? override.getStringList("room-lore-trailer-overfull")
                 : base.roomLoreTrailerOverfull;
+
+        return merged;
+    }
+
+    public static DifficultySelectorGui mergeDifficultySelector(DifficultySelectorGui base, YamlConfiguration override) {
+        DifficultySelectorGui merged = new DifficultySelectorGui();
+
+        // title
+        merged.title = override.contains("title")
+                ? override.getString("title")
+                : base.title;
+
+        // layout
+        merged.layout = override.contains("layout")
+                ? override.getStringList("layout")
+                : base.layout;
+
+        // openSound
+        if (override.contains("open-sound")) {
+            try {
+                merged.openSound = Sound.valueOf(
+                        override.getString("open-sound").toUpperCase(Locale.ROOT)
+                );
+            } catch (IllegalArgumentException e) {
+                merged.openSound = base.openSound;
+            }
+        } else {
+            merged.openSound = base.openSound;
+        }
+
+        // components: start with base, then apply overrides
+        merged.components = new HashMap<>(base.components);
+        if (override.contains("components")) {
+            ConfigurationSection compSec = override.getConfigurationSection("components");
+            for (String key : compSec.getKeys(false)) {
+                if (key.length() != 1) continue;
+                Component comp = ConfigHelper.load(Component.class, compSec.getConfigurationSection(key));
+                merged.components.put(key.charAt(0), comp);
+            }
+        }
+
+        // roomLoreTrailer
+        merged.roomLoreTrailer = override.contains("room-lore-trailer")
+                ? override.getStringList("room-lore-trailer")
+                : base.roomLoreTrailer;
+
+        // roomLockedTrailer
+        merged.roomLockedTrailer = override.contains("room-locked-trailer")
+                ? override.getStringList("room-locked-trailer")
+                : base.roomLockedTrailer;
+
+        // difficultyName
+        merged.difficultyName = override.contains("difficulty-name")
+                ? override.getString("difficulty-name")
+                : base.difficultyName;
 
         return merged;
     }

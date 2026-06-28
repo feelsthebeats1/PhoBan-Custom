@@ -13,6 +13,7 @@ public class GuiRegistry {
     public static Gui SOUND_EXPLORER;
 
     public static final Map<String, RoomSelectorGui> CATEGORY_ROOM_SELECTORS = new HashMap<>();
+    public static final Map<String, DifficultySelectorGui> ROOM_DIFFICULTY_SELECTORS = new HashMap<>();
 
     public static void openRoomSelector(Player player) {
         ROOM_SELECTOR.open(player, new RoomSelectorGuiHandler());
@@ -32,7 +33,8 @@ public class GuiRegistry {
     }
 
     public static void openDifficultySelector(Player player, String roomId, String categoryFilter) {
-        DIFFICULTY_SELECTOR.open(player, new DifficultySelectorGuiHandler(roomId, categoryFilter));
+        DifficultySelectorGui gui = ROOM_DIFFICULTY_SELECTORS.getOrDefault(roomId, DIFFICULTY_SELECTOR);
+        gui.open(player, new DifficultySelectorGuiHandler(roomId, categoryFilter));
     }
 
     public static void openSoundExplorer(Player player) {
