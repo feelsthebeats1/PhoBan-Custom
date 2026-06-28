@@ -151,9 +151,19 @@ public final class PhoBan extends JavaPlugin {
             String fileName = "gui/difficulty-selector-" + roomId + ".yml";
             File diffFile = new File(getDataFolder(), fileName);
             if (!diffFile.exists()) continue;
-            YamlConfiguration diffConfig = YamlConfiguration.loadConfiguration(diffFile);
-            DifficultySelectorGui merged = ConfigMerger.mergeDifficultySelector(GuiRegistry.DIFFICULTY_SELECTOR, diffConfig);
-            GuiRegistry.ROOM_DIFFICULTY_SELECTORS.put(roomId, merged);
+
+            // Load override YAML
+            YamlConfiguration override = YamlConfiguration.loadConfiguration(diffFile);
+
+            // Re-read base YAML làm nền, apply override lên trên
+            YamlConfiguration baseConfig = requestConfig("gui/difficulty-selector.yml");
+            for (String key : override.getKeys(false)) {
+                baseConfig.set(key, override.get(key));
+            }
+
+            // Load merged config qua ConfigHelper — đúng lifecycle (postHandler chạy)
+            DifficultySelectorGui gui = ConfigHelper.load(DifficultySelectorGui.class, baseConfig);
+            GuiRegistry.ROOM_DIFFICULTY_SELECTORS.put(roomId, gui);
         }
 
         new GuiRefreshTask().runTaskTimer(this, 0L, 20L);
