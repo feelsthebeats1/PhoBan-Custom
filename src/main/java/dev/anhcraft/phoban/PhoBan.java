@@ -146,27 +146,38 @@ public final class PhoBan extends JavaPlugin {
             GuiRegistry.CATEGORY_ROOM_SELECTORS.put(category, merged);
         }
 
-        // Load per-room difficulty selector overrides
+        // Load per-category difficulty selector overrides (files có room-id: false)
+        GuiRegistry.CATEGORY_DIFFICULTY_SELECTORS.clear();
+        for (String category : gameManager.getCategories()) {
+            String fileName = "gui/difficulty-selector-" + category + ".yml";
+            File catFile = new File(getDataFolder(), fileName);
+            if (!catFile.exists()) continue;
+            YamlConfiguration testConfig = YamlConfiguration.loadConfiguration(catFile);
+            if (!testConfig.contains("room-id") || testConfig.getBoolean("room-id", true)) continue;
+            YamlConfiguration baseConfig = requestConfig("gui/difficulty-selector.yml");
+            deepMerge(baseConfig, testConfig);
+            DifficultySelectorGui gui = ConfigHelper.load(DifficultySelectorGui.class, baseConfig);
+            GuiRegistry.CATEGORY_DIFFICULTY_SELECTORS.put(category, gui);
+            getLogger().info("  Loaded category difficulty override: " + category);
+        }
+
+        // Load per-room difficulty selector overrides (files không có room-id hoặc room-id: true)
         GuiRegistry.ROOM_DIFFICULTY_SELECTORS.clear();
-        getLogger().info("Loading per-room difficulty selectors. Rooms: " + gameManager.getRoomIds());
         for (String roomId : gameManager.getRoomIds()) {
             String fileName = "gui/difficulty-selector-" + roomId + ".yml";
             File diffFile = new File(getDataFolder(), fileName);
-            getLogger().info("  Checking " + fileName + " exists=" + diffFile.exists());
             if (!diffFile.exists()) continue;
 
-            // Load override YAML
-            YamlConfiguration override = YamlConfiguration.loadConfiguration(diffFile);
+            // Bỏ qua file đã dùng làm category override
+            YamlConfiguration testConfig = YamlConfiguration.loadConfiguration(diffFile);
+            if (testConfig.contains("room-id") && !testConfig.getBoolean("room-id", true)) continue;
 
-            // Load base YAML, deep-merge bằng ConfigurationSection (tránh dot notation với key đặc biệt như "-")
             YamlConfiguration baseConfig = requestConfig("gui/difficulty-selector.yml");
-            deepMerge(baseConfig, override);
-
+            deepMerge(baseConfig, testConfig);
             DifficultySelectorGui gui = ConfigHelper.load(DifficultySelectorGui.class, baseConfig);
             GuiRegistry.ROOM_DIFFICULTY_SELECTORS.put(roomId, gui);
-            getLogger().info("  -> Loaded override for room: " + roomId);
+            getLogger().info("  Loaded room difficulty override: " + roomId);
         }
-        getLogger().info("ROOM_DIFFICULTY_SELECTORS keys: " + GuiRegistry.ROOM_DIFFICULTY_SELECTORS.keySet());
 
         new GuiRefreshTask().runTaskTimer(this, 0L, 20L);
         new GameTickingTask().runTaskTimerAsynchronously(this, 0L, 20L);

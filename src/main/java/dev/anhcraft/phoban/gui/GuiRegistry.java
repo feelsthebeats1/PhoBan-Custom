@@ -1,6 +1,7 @@
 package dev.anhcraft.phoban.gui;
 
 import dev.anhcraft.phoban.PhoBan;
+import dev.anhcraft.phoban.config.RoomConfig;
 import dev.anhcraft.palette.ui.Gui;
 import org.bukkit.entity.Player;
 
@@ -15,6 +16,7 @@ public class GuiRegistry {
 
     public static final Map<String, RoomSelectorGui> CATEGORY_ROOM_SELECTORS = new HashMap<>();
     public static final Map<String, DifficultySelectorGui> ROOM_DIFFICULTY_SELECTORS = new HashMap<>();
+    public static final Map<String, DifficultySelectorGui> CATEGORY_DIFFICULTY_SELECTORS = new HashMap<>();
 
     public static void openRoomSelector(Player player) {
         ROOM_SELECTOR.open(player, new RoomSelectorGuiHandler());
@@ -34,10 +36,24 @@ public class GuiRegistry {
     }
 
     public static void openDifficultySelector(Player player, String roomId, String categoryFilter) {
-        DifficultySelectorGui gui = ROOM_DIFFICULTY_SELECTORS.getOrDefault(roomId, DIFFICULTY_SELECTOR);
-        PhoBan.instance.getLogger().info("openDifficultySelector roomId=" + roomId
-                + " isOverride=" + (gui != DIFFICULTY_SELECTOR)
-                + " title='" + (gui.title != null ? gui.title.substring(0, Math.min(30, gui.title.length())) : "null") + "'");
+        DifficultySelectorGui gui = null;
+
+        // 1. Category override (ưu tiên cao nhất)
+        RoomConfig roomConfig = PhoBan.instance.gameManager.getRoomConfig(roomId);
+        if (roomConfig != null && roomConfig.getCategory() != null) {
+            gui = CATEGORY_DIFFICULTY_SELECTORS.get(roomConfig.getCategory());
+        }
+
+        // 2. Room override
+        if (gui == null) {
+            gui = ROOM_DIFFICULTY_SELECTORS.get(roomId);
+        }
+
+        // 3. Base fallback
+        if (gui == null) {
+            gui = DIFFICULTY_SELECTOR;
+        }
+
         gui.open(player, new DifficultySelectorGuiHandler(roomId, categoryFilter, gui));
     }
 
