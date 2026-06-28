@@ -1,5 +1,6 @@
 package dev.anhcraft.phoban.gui;
 
+import dev.anhcraft.phoban.PhoBan;
 import dev.anhcraft.palette.ui.Gui;
 import org.bukkit.entity.Player;
 
@@ -34,6 +35,9 @@ public class GuiRegistry {
 
     public static void openDifficultySelector(Player player, String roomId, String categoryFilter) {
         DifficultySelectorGui gui = ROOM_DIFFICULTY_SELECTORS.getOrDefault(roomId, DIFFICULTY_SELECTOR);
+        PhoBan.instance.getLogger().info("openDifficultySelector roomId=" + roomId
+                + " isOverride=" + (gui != DIFFICULTY_SELECTOR)
+                + " title='" + (gui.title != null ? gui.title.substring(0, Math.min(30, gui.title.length())) : "null") + "'");
         gui.open(player, new DifficultySelectorGuiHandler(roomId, categoryFilter, gui));
     }
 
