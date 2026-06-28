@@ -26,6 +26,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.GameMode;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
@@ -152,15 +153,39 @@ public final class PhoBan extends JavaPlugin {
             File diffFile = new File(getDataFolder(), fileName);
             if (!diffFile.exists()) continue;
 
-            // Load override YAML trực tiếp (user copy base và sửa, đã có đủ section)
-            YamlConfiguration diffConfig = YamlConfiguration.loadConfiguration(diffFile);
-            DifficultySelectorGui gui = ConfigHelper.load(DifficultySelectorGui.class, diffConfig);
+            // Load override YAML
+            YamlConfiguration override = YamlConfiguration.loadConfiguration(diffFile);
+
+            // Load base YAML, apply override từng leaf path bằng dot notation
+            YamlConfiguration baseConfig = requestConfig("gui/difficulty-selector.yml");
+            for (String key : override.getKeys(false)) {
+                if (override.isConfigurationSection(key)) {
+                    baseConfig.set(key, null);
+                    applySection(baseConfig, key, override.getConfigurationSection(key));
+                } else {
+                    baseConfig.set(key, override.get(key));
+                }
+            }
+
+            DifficultySelectorGui gui = ConfigHelper.load(DifficultySelectorGui.class, baseConfig);
             GuiRegistry.ROOM_DIFFICULTY_SELECTORS.put(roomId, gui);
         }
 
         new GuiRefreshTask().runTaskTimer(this, 0L, 20L);
         new GameTickingTask().runTaskTimerAsynchronously(this, 0L, 20L);
         (freeTicketTask = new FreeTicketTask(this)).runTaskTimerAsynchronously(this, 0L, mainConfig.freeTicketEvery*20L);
+    }
+
+    private void applySection(YamlConfiguration config, String parentKey, ConfigurationSection section) {
+        for (String subKey : section.getKeys(false)) {
+            String fullPath = parentKey + "." + subKey;
+            if (section.isConfigurationSection(subKey)) {
+                config.set(fullPath, null);
+                applySection(config, fullPath, section.getConfigurationSection(subKey));
+            } else {
+                config.set(fullPath, section.get(subKey));
+            }
+        }
     }
 
     public YamlConfiguration requestConfig(String path) {
