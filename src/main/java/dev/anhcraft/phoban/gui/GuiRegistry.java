@@ -34,7 +34,7 @@ public class GuiRegistry {
 
     public static void openDifficultySelector(Player player, String roomId, String categoryFilter) {
         DifficultySelectorGui gui = ROOM_DIFFICULTY_SELECTORS.getOrDefault(roomId, DIFFICULTY_SELECTOR);
-        gui.open(player, new DifficultySelectorGuiHandler(roomId, categoryFilter));
+        gui.open(player, new DifficultySelectorGuiHandler(roomId, categoryFilter, gui));
     }
 
     public static void openSoundExplorer(Player player) {

@@ -27,15 +27,25 @@ import java.util.List;
 public class DifficultySelectorGuiHandler extends GuiHandler implements AutoRefresh {
     private final String roomId;
     private final String categoryFilter;
+    private final DifficultySelectorGui gui;
     private PlayerData playerData;
 
     public DifficultySelectorGuiHandler(String roomId) {
-        this(roomId, null);
+        this(roomId, null, null);
     }
 
     public DifficultySelectorGuiHandler(String roomId, @Nullable String categoryFilter) {
+        this(roomId, categoryFilter, null);
+    }
+
+    public DifficultySelectorGuiHandler(String roomId, @Nullable String categoryFilter, @Nullable DifficultySelectorGui gui) {
         this.roomId = roomId;
         this.categoryFilter = categoryFilter;
+        this.gui = gui;
+    }
+
+    private DifficultySelectorGui gui() {
+        return gui != null ? gui : GuiRegistry.DIFFICULTY_SELECTOR;
     }
 
     @Override
@@ -132,10 +142,10 @@ public class DifficultySelectorGuiHandler extends GuiHandler implements AutoRefr
                         .add("requiredRoom", roomConfig.getName())
                         .add("requiredDifficulty", Difficulty.values()[difficulty.ordinal()-1]);
                 replaceItem(slot, (index, itemBuilder) -> {
-                    itemBuilder.name(GuiRegistry.DIFFICULTY_SELECTOR.difficultyName);
+                    itemBuilder.name(gui().difficultyName);
                     roomConfig.applyIconTo(itemBuilder);
                     itemBuilder.lore(roomConfig.getDescription());
-                    itemBuilder.lore().addAll(GuiRegistry.DIFFICULTY_SELECTOR.roomLockedTrailer);
+                    itemBuilder.lore().addAll(gui().roomLockedTrailer);
                     return placeholder.replace(itemBuilder);
                 });
                 getSlot(slot).clearEvents();
@@ -169,10 +179,10 @@ public class DifficultySelectorGuiHandler extends GuiHandler implements AutoRefr
             }
 
             replaceItem(slot, (index, itemBuilder) -> {
-                itemBuilder.name(GuiRegistry.DIFFICULTY_SELECTOR.difficultyName);
+                itemBuilder.name(gui().difficultyName);
                 roomConfig.applyIconTo(itemBuilder);
                 itemBuilder.lore(roomConfig.getDescription());
-                itemBuilder.lore().addAll(GuiRegistry.DIFFICULTY_SELECTOR.roomLoreTrailer);
+                itemBuilder.lore().addAll(gui().roomLoreTrailer);
                 return placeholder.replace(itemBuilder);
             });
 
