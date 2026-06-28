@@ -156,16 +156,9 @@ public final class PhoBan extends JavaPlugin {
             // Load override YAML
             YamlConfiguration override = YamlConfiguration.loadConfiguration(diffFile);
 
-            // Load base YAML, apply override từng leaf path bằng dot notation
+            // Load base YAML, deep-merge bằng ConfigurationSection (tránh dot notation với key đặc biệt như "-")
             YamlConfiguration baseConfig = requestConfig("gui/difficulty-selector.yml");
-            for (String key : override.getKeys(false)) {
-                if (override.isConfigurationSection(key)) {
-                    baseConfig.set(key, null);
-                    applySection(baseConfig, key, override.getConfigurationSection(key));
-                } else {
-                    baseConfig.set(key, override.get(key));
-                }
-            }
+            deepMerge(baseConfig, override);
 
             DifficultySelectorGui gui = ConfigHelper.load(DifficultySelectorGui.class, baseConfig);
             GuiRegistry.ROOM_DIFFICULTY_SELECTORS.put(roomId, gui);
@@ -176,14 +169,15 @@ public final class PhoBan extends JavaPlugin {
         (freeTicketTask = new FreeTicketTask(this)).runTaskTimerAsynchronously(this, 0L, mainConfig.freeTicketEvery*20L);
     }
 
-    private void applySection(YamlConfiguration config, String parentKey, ConfigurationSection section) {
-        for (String subKey : section.getKeys(false)) {
-            String fullPath = parentKey + "." + subKey;
-            if (section.isConfigurationSection(subKey)) {
-                config.set(fullPath, null);
-                applySection(config, fullPath, section.getConfigurationSection(subKey));
+    private void deepMerge(ConfigurationSection base, ConfigurationSection override) {
+        for (String key : override.getKeys(false)) {
+            if (override.isConfigurationSection(key)) {
+                ConfigurationSection baseSub = base.contains(key)
+                        ? base.getConfigurationSection(key)
+                        : base.createSection(key);
+                deepMerge(baseSub, override.getConfigurationSection(key));
             } else {
-                config.set(fullPath, section.get(subKey));
+                base.set(key, override.get(key));
             }
         }
     }
